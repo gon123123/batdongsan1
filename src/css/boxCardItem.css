@@ -1,0 +1,92 @@
+
+.card {
+    max-width: 300px;
+    height: 380px;
+    background: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    margin: 0px 10px 20px 10px;
+  }
+  .card_top {
+    height: 262px;
+    border-radius: 15px 15px 0px 0px;
+    padding: 5px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card_top img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px 10px 0px 0px;
+    transition: 0.35s;
+    /* position: absolute; */
+  }
+  .card:hover img {
+    height: 105%;
+  }
+  .card_bottom {
+    width: 100%;
+    height: 140px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    position: absolute;
+    bottom: 0;
+    padding: 5px 5px 0px 5px;
+  }
+  .card_bottom_priceStar {
+    display: flex;
+    flex-direction: row;
+    /* background-color: green; */
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card_bottom_priceStar span {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    overflow-wrap: nowrap;
+  }
+  .card_bottom_priceStar p {
+    margin: 0px;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 20px;
+    color: #ffa34d;
+    margin-left: 10px;
+  }
+  .card_bottom_priceStar .text {
+    width: 300px;
+    margin: 0px;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 20px;
+    color: #141414;
+    line-height: 20px;
+    margin-left: 10px;
+  }
+  .card_bottom .btn_right {
+    background: #f67575;
+    float: right;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
+  .card_bottom .btn_left {
+    background: #FFA34D;
+    float: left;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+  }
+  .card_bottom button {
+    padding: 2px 10px 5px 10px;
+    border: none;
+    border-radius: 10px;
+    /* text */
+    font-weight: 300;
+    font-size: 16px;
+    color: #ffffff;
+  }
+  

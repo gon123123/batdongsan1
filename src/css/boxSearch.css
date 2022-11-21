@@ -1,0 +1,24 @@
+.filterData_search {
+    display: flex;
+    flex-direction: row;
+  }
+  .search_input {
+    width: 298px;
+    height: 30px;
+    border-width: 1px 0px 1px 1px;
+    border-style: solid;
+    border-color: #1eb2a6;
+    border-radius: 10px 0px 0px 10px;
+    padding-left: 10px;
+  }
+  .search_icon {
+    width: 39px;
+    height: 30px;
+    background: #1eb2a6;
+    border: 1px solid #1eb2a6;
+    border-radius: 0px 10px 10px 0px;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

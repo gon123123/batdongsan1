@@ -1,0 +1,45 @@
+.boxAction {
+    width: 54px;
+    height: calc(100vh - 100px);
+    background: #ffffff;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
+    padding: 10px 8px 8px 5px;
+    transition: 0.35s;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 100px;
+    left: 30px;
+    z-index: 99;
+  }
+.boxAction_item {
+    cursor: pointer;
+    width: 43px;
+    height: 43px;
+    background: #ffffff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    padding: 10px 10px 10px 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: 0.35s;
+  }
+  .boxAction_item span {
+    line-height: 0px;
+  }
+  .Action_item-title {
+    padding-top: 15px;
+    margin-left: 10px;
+    font-weight: 400;
+    font-size: 16px;
+    color: #000000;
+    text-overflow: ellipsis;
+  }
+  .boxAction:hover {
+    width: 164px;
+  }
+  .boxAction:hover .boxAction_item {
+    width: 150px;
+  }
+  

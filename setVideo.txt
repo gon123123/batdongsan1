@@ -1,0 +1,43 @@
+import React, { useState } from 'react';
+// import Slider from 'react-slick';
+import '../css/home.css';
+function Home() {
+    const [videoA, setVideoA] = useState(null);
+    function openStream() {
+        const constraints = {
+            audio: true,
+            video: true,
+        }
+        return navigator.mediaDevices.getUserMedia(constraints); // cái này trả về một promise
+        // navigator.mediaDevices. lấy thông tin về các thiết bị đa phương tiện 
+        // navigator.mediaDevices.getUserMedia() // yêu cầu quyền truy cập và các phương tiện
+    }
+
+    function playStream(idVideoTag, stream) {
+        const video = document.getElementById(idVideoTag);
+        video.srcObject = stream; // đặt hoặc trả về một đối tượng  đóng vai trò là nguồn của media với HTMLMediaElement
+        video.play(); //
+    }
+    function callVideo() {
+        openStream() // cấu hình , yêu cầu quyền phương tiện 
+            .then(stream => {
+                // playStream('localStream', stream); // bật Video bên mình lên 
+                setVideoA({ stream });
+            }
+            )
+    }
+    return (
+        <div className="home">
+            <h2>Animation background wefrwef</h2>
+            <div className="homeCarousel">
+                <video ref={video => video.srcObject =videoA } className="banner-video" id="localStream" src={videoA || null} controls ></video>
+                <video controls autoPlay>
+                    <source src="../asset/video/banner.mp4" />
+                </video>
+                <button type="button" className="" onClick={() => callVideo()}>goi</button>
+            </div>
+        </div>
+    )
+}
+
+export default Home

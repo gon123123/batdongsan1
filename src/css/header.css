@@ -1,0 +1,71 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
+  padding: 27px 13px 27px 11px;
+  background: #ffffff;
+  box-shadow: 0px 1px 7px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+.header_logo {
+  flex-grow: 1;
+}
+.header_action {
+  flex-grow: 2;
+
+  display: flex;
+  justify-content: center;
+}
+.header_logo-lg {
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 36.57px;
+}
+.header_logo-md {
+  font-style: italic;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  color: #1eb2a6;
+}
+.header_action-actionItem {
+  font-size: 15px;
+  font-weight: 400;
+  text-decoration: none;
+  margin: 0px 20px;
+  color: #141414;
+  transition: 0.35s;
+}
+.header_action-actionItem:hover {
+  font-size: 16px;
+  color: #000;
+}
+.header_button {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+.header_button-action {
+  cursor: pointer;
+  width: 107px;
+  height: 32px;
+  background-color: #141414;
+  /* background-color: #FFFFFF; */
+  border-radius: 15px;
+  border: none;
+  outline: none;
+  /* text */
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 18px;
+  text-align: center;
+  color: #ffffff;
+}
+.header_button-action--light {
+  background-color: #ffffff;
+  color: #141414;
+}
