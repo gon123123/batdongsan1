@@ -4,9 +4,9 @@ import '../css/boxCardItem.css'
 import anhCard from '../asset/image/about1.jpg';
 
 function BoxCard2button(props) {
-    const { image, price, star, map, area } = props.data;
+    console.log(props.data);
+    const { idMyPost, image, title, date, map, price, area, province, star, description } = props.data;
     console.log(image);
-
     const starSTR = 1;
     var item = [];
     for (let i = 0; i < star; i++) {
@@ -15,7 +15,7 @@ function BoxCard2button(props) {
     return (
         <div className="card">
             <div className="card_top">
-                <img src={anhCard} alt="" />
+                <img src={image[0].url} alt="" />
             </div>
             <div className="card_bottom">
                 <div className="card_bottom_priceStar">
@@ -42,7 +42,7 @@ function BoxCard2button(props) {
                     </span>
                 </div>
                 <button type="button" className="btn_left">delete</button>
-                <button type="button" className="btn_right" onClick={()=>props.handler(props.data)}>edit</button>
+                <button type="button" className="btn_right" onClick={()=>props.handler({content : 1, index : props.index})}>edit</button>
             </div>
         </div>
     )

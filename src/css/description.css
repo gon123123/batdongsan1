@@ -20,7 +20,7 @@
   width: 100%;
 }
 .slick-dots img {
-  margin-top: 40px;
+  margin-top: 10px;
   width: 50px;
   height: 50px;
 }
@@ -73,13 +73,14 @@
   width: 892px;
 }
 .btn_description {
-    margin-top: 40px;
+  margin-top: 40px;
   width: 892px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 .btn_description-text {
+  cursor: pointer;
   font-weight: 700;
   font-size: 16px;
   line-height: 20px;
@@ -87,11 +88,11 @@
   color: #1eb2a6;
   margin-left: 5px;
 }
-.chat{
-    display: flex;
-    flex-direction: row;
-    cursor: pointer;
-    border:none;
-    background: none;
-    height: auto;
+.chat {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  border: none;
+  background: none;
+  height: auto;
 }

@@ -4,7 +4,7 @@ import '../css/boxCardItem.css'
 import anhCard from '../asset/image/about1.jpg';
 
 function BoxCardItem(props) {
-    const { image, price, star, map, area } = props.data;
+    const { idMyPost, idUser, image, title, date, map, price, area, province, star, description } = props.data;
     console.log(image);
 
     const starSTR = 1;
@@ -15,7 +15,7 @@ function BoxCardItem(props) {
     return (
         <div className="card">
             <div className="card_top">
-                <img src={anhCard} alt="" />
+                <img src={image[0].url} alt="" />
             </div>
             <div className="card_bottom">
                 <div className="card_bottom_priceStar">

@@ -6,6 +6,7 @@ import '../css/home.css';
 import about1 from '../asset/image/about1.jpg'
 import about2 from '../asset/image/about2.jpg'
 import personnel1 from '../asset/image/personnel1.jpg'
+
 function Home() {
     return (
         <div className="home">
@@ -52,7 +53,7 @@ function Home() {
                                     <div className="personnel_search">
                                         <box-icon name='search' color='white'></box-icon>
                                     </div>
-                                    <p className="personnel_title">Bui Minh Tuan</p>
+                                    <p className="personnel_title">Minh Tuan</p>
                                     <p className="personnel_text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Omnis, molestias.</p>
                                 </div>
                             </a>
@@ -64,7 +65,7 @@ function Home() {
                                     <div className="personnel_search">
                                         <box-icon name='search' color='white'></box-icon>
                                     </div>
-                                    <p className="personnel_title">Bui Minh Tuan</p>
+                                    <p className="personnel_title">Thi Vi</p>
                                     <p className="personnel_text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Omnis, molestias.</p>
                                 </div>
                             </a>
@@ -76,7 +77,7 @@ function Home() {
                                     <div className="personnel_search">
                                         <box-icon name='search' color='white'></box-icon>
                                     </div>
-                                    <p className="personnel_title">Bui Minh Tuan</p>
+                                    <p className="personnel_title">Nguye Hanh</p>
                                     <p className="personnel_text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Omnis, molestias.</p>
                                 </div>
                             </a>
@@ -88,7 +89,7 @@ function Home() {
                                     <div className="personnel_search">
                                         <box-icon name='search' color='white'></box-icon>
                                     </div>
-                                    <p className="personnel_title">Bui Minh Tuan</p>
+                                    <p className="personnel_title">Cong Lam</p>
                                     <p className="personnel_text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Omnis, molestias.</p>
                                 </div>
                             </a>

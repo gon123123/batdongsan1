@@ -6,7 +6,7 @@ import 'boxicons';
 import '../css/description.css'
 import anh from '../asset/image/anh.jpg';
 
-function Description(props) {
+function FavoriteRead(props) {
     var settings = {
         customPaging: function (i) {
             return (
@@ -23,12 +23,12 @@ function Description(props) {
         swipeToSlide: true,
         dotsClass: "slick-dots slick-thumb",
     };
-    const { idUser, idMyPost, image, title, date, map, price, area, province, star, description } = props.data;
+    const { image, title, date, map, price, area, province, star, description } = props.data;
     return (
         <div className="boxDescription">
             <div className="slickCarousel">
                 <Slider {...settings}>
-                    {
+                {
                         image.map((item, index) => <img key={index} src={item.url} id="up" alt={item.type} />)
                     }
                 </Slider>
@@ -54,8 +54,8 @@ function Description(props) {
 
             <p className="textDescription">{description}</p>
             <div className="btn_description">
-                <p className="btn_description-text" onClick={() => props.handlerFavorite(props.data)}>Save post</p>
-                <button type="button" className="chat" onClick={() => props.handlerChat(idUser)}>
+                <p className="btn_description-text"></p>
+                <button type="button" className="chat">
                     <box-icon name='message-square-dots' type='solid' color="#1eb2a6" ></box-icon>
                     <p className="btn_description-text">Chat</p>
                 </button>
@@ -64,4 +64,4 @@ function Description(props) {
     )
 }
 
-export default Description
+export default FavoriteRead

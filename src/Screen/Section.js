@@ -5,9 +5,11 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 import anhCard from '../asset/image/about1.jpg';
-// component 
+// component section
 import Port from './section/Port';
 import MyPort from './section/MyPort';
+import Favorite from './section/Favorite';
+import Message from './section/Message';
 
 function Section(props) {
     console.log(props.section);
@@ -16,6 +18,10 @@ function Section(props) {
             return <Port></Port>
         } else if (props.section === 1) {
             return <MyPort></MyPort>
+        } else if (props.section === 2) {
+            return <Favorite></Favorite>
+        } else if (props.section === 3) {
+            return <Message></Message>
         }
     }
     return (

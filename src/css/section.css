@@ -5,8 +5,8 @@
   flex-direction: row;
   padding-top: 10px;
   position: relative;
-  top: -90vh;
-  margin-bottom: -80vh;
+  /* top: -90vh; */
+  /* margin-bottom: -80vh; */
 }
 .colSection {
   padding: 20px 20px 0px 20px;

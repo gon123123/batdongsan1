@@ -69,3 +69,68 @@
   background-color: #ffffff;
   color: #141414;
 }
+
+.account {
+  display: flex;
+  flex-direction: row;
+  padding: 14px 5px 10px 0px;
+  justify-content: center;
+  align-items: center;
+}
+.account img {
+  width: 35px;
+  height: 35px;
+  border-radius: 100rem;
+}
+.account p {
+  font-style: italic;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  color: #000000;
+  margin: 0px 5px 0px 10px;
+}
+.account button {
+  border: none;
+  background: transparent;
+  width: 24px;
+  height: 24px;
+}
+.option {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  width: 200px;
+  height: 200px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+  /* opacity: 0; */
+  transition: 0.35s;
+  padding: 5px 10px 5px 10px;
+}
+.option::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 5px;
+  border-bottom: 10px solid #d9d9d9;
+  border-right: 6px solid transparent;
+  border-left: 6px solid transparent;
+}
+.optionItem{
+    cursor: pointer;
+    margin-bottom: 3px;
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: row;
+    border-radius: 5px;
+    transition: 0.2s
+}
+.optionItem:hover{
+    background-color: #F9F9F9;
+}
+.optionItem p{
+    font-weight: 500;
+font-size: 14px;
+}

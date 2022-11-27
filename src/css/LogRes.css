@@ -38,10 +38,10 @@ a {
 }
 .colRight form label,
 input,
-input[type="submit"] {
+input[type="button"] {
   width: 55%;
 }
-input[type="submit"] {
+input[type="button"] {
   cursor: pointer;
   width: 56%;
   margin-top: 8px;
