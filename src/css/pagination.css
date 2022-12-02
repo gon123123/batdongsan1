@@ -5,7 +5,7 @@
     margin-top: 20px;
     margin-bottom: 20px;
   }
-  .pagination a {
+  .pagination span {
     color: black;
     float: left;
     padding: 5px 14px;
@@ -13,11 +13,11 @@
     transition: background-color 0.3s;
   }
   /* thiết lập style cho class active */
-  .pagination a.active {
+  .pagination span.active {
     background-color: #ffa34d;
     color: white;
   }
   /* thêm màu nền khi người dùng hover vào class không active */
-  .pagination a:hover:not(.active) {
+  .pagination span:hover:not(.active) {
     background-color: #ddd;
   }

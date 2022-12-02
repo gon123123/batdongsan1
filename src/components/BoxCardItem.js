@@ -3,10 +3,7 @@ import '../css/boxCardItem.css'
 
 import anhCard from '../asset/image/about1.jpg';
 
-function BoxCardItem(props) {
-    const { idMyPost, idUser, image, title, date, map, price, area, province, star, description } = props.data;
-    console.log(image);
-
+function BoxCardItem({ idSell, image, title, date, address, price, area, star, province, description, handler }) {
     const starSTR = 1;
     var item = [];
     for (let i = 0; i < star; i++) {
@@ -32,7 +29,7 @@ function BoxCardItem(props) {
                 <div className="card_bottom_priceStar">
                     <span>
                         <box-icon name='map' color="gray" size="xs"></box-icon>
-                        <p className="text">{map}</p>
+                        <p className="text">{address}</p>
                     </span>
                 </div>
                 <div className="card_bottom_priceStar">
@@ -41,7 +38,7 @@ function BoxCardItem(props) {
                         <p className="text">{area} m<sup>2</sup> </p>
                     </span>
                 </div>
-                <button type="button" className="btn_right" onClick={()=>props.handler(props.data)}>read more</button>
+                <button type="button" className="btn_right" onClick={() => handler({ idSell, image, title, date, address, price, area, star, province, description })}>read more</button>
             </div>
         </div>
     )

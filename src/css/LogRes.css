@@ -4,7 +4,7 @@
   height: 100vh;
 }
 a {
-    text-decoration: none;
+  text-decoration: none;
 }
 .colLeft {
   width: 100%;
@@ -25,6 +25,17 @@ a {
   justify-content: center;
   align-items: center;
 }
+.backHome {
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  line-height: 0px;
+  color: #21af90;
+  font-weight: bold;
+  font-size: 16px;
+  transition: 0.2s;
+}
 .colRight h3 {
   font-size: 3rem;
   color: #21af90;
@@ -38,13 +49,13 @@ a {
 }
 .colRight form label,
 input,
-input[type="button"] {
+input[type="submit"] {
   width: 55%;
 }
-input[type="button"] {
+input[type="submit"] {
   cursor: pointer;
   width: 56%;
-  margin-top: 8px;
+  margin-top: 15px !important;
   background-color: #21af90;
   color: #fff;
   font-weight: bold;
@@ -60,7 +71,7 @@ input[type="button"] {
   border: none;
   border-radius: 1.5rem;
   margin-top: 5px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   outline-offset: 1px;
   outline-color: #21af90;
   border: 1px solid #21af90;
@@ -85,7 +96,21 @@ input[type="button"] {
   margin-bottom: 20px;
 }
 .with img {
-    cursor: pointer;
+  cursor: pointer;
   width: 44px;
   cursor: pointer;
+}
+
+.formInput_error1 {
+  margin-top: 7px;
+  font-size: 12px;
+  font-style: italic;
+  color: #f67575;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  margin-left: 25%;
+}
+.link {
+  cursor: pointer;
+  color: blue;
 }

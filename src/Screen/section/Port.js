@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Slider from 'react-slick';
 
+// component 
 import BoxCardItem from '../../components/BoxCardItem'
 import Pagination from '../../components/Pagination';
 import BoxSearch from '../../components/BoxSearch';
@@ -8,21 +9,55 @@ import BoxSelect from '../../components/BoxSelect';
 
 import Description from '../../components/Description';
 
+// asset 
+import loading from '../../asset/video/loading.gif'
+
 import firebase from "firebase/app";
-// import "firebase/auth";
-import "firebase/database";
-import "firebase/firestore";
-import "firebase/functions";
-import "firebase/storage";
-function Port() {
-    const keyUser = localStorage.getItem("keyUser");
-    const account = JSON.parse(localStorage.getItem("account")); // thông tin của người đang dùng
+import { connectDatabase } from '../../helper/configDatabase';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function Port({ idUser }) {
+    const [listPost, setListPost] = useState(null);
+    const [listPost2, setListPost2] = useState(null);
+    const [readPost, setReadPost] = useState({
+        read: false,
+        data: null,
+    });
+    const [valueOption, setValueOption] = useState("all");
+    const [listPagination, setListPagination] = useState([{ num: 1 }]);
+    const [numPagination, setNumPagination] = useState(1);
+    useEffect(() => {
+        const getListPost = async () => {
+            await firebase.database().ref('post/').on('value', function (snapshot) {
+                let array = [];
+                snapshot.forEach(function (item) {
+                    var childData = item.val();
+                    array.push(childData);
+                })
+                setListPost2(array);
+                // hiển thị 1 phần boxCard 
+                setListPost(array.slice(0, 4));
+                console.log(array);
+                // xử lý pagination 
+                let array2 = [];
+                let num = Math.ceil(array.length / 4);
+                for (let i = 0; i < num; i++) {
+                    array2.push({ num: i + 1 });
+                }
+                setListPagination(array2);
+            })
+        }
+        connectDatabase();
+        getListPost();
+    }, []);
     var settings = {
-        dots: true,
+        dots: false,
         infinite: true,
         speed: 500,
         slidesToShow: 5,
-        slidesToScroll: 1,
+        slidesToScroll: 3,
         autoplay: true,
         autoplaySpeed: 3500,
         swipeToSlide: true,
@@ -53,66 +88,6 @@ function Port() {
             }
         ]
     };
-    const [readPost, setReadPost] = useState({
-        read: false,
-        data: null,
-    })
-    useEffect(() => {
-        const firebaseConfig = {
-            apiKey: "AIzaSyCi03lnEWgFK61CV32HJaPsYC8uohWG2AA",
-            authDomain: "batdongsanweb.firebaseapp.com",
-            projectId: "batdongsanweb",
-            storageBucket: "batdongsanweb.appspot.com",
-            messagingSenderId: "853795324769",
-            appId: "1:853795324769:web:6128febc029646f2763b20",
-            measurementId: "G-4DH9E26NJV"
-        };
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log("ket noi thanh cong myPort");
-        }
-        getPost();
-        getListFavorite();
-    }, []);
-    const [listPost, setListPost] = useState(null);
-    const [listFavorite, setListFavorite] = useState(null);
-    const getPost = () => {
-        firebase.database().ref('posts/').on('value', (snapshot) => {
-            let arrCPList = []
-            snapshot.forEach(function (itemMyPort) {
-                arrCPList = itemMyPort.val();
-            })
-            setListPost(arrCPList);
-            console.log("danh sach post");
-            console.log(arrCPList);
-        })
-    }
-    const getListFavorite = () => {
-        firebase.database().ref('favorite/' + keyUser).on('value', (snapshot) => {
-            let arrCPList = []
-            snapshot.forEach(function (itemFavorite) {
-                arrCPList = itemFavorite.val();
-            })
-            setListFavorite(arrCPList);
-            console.log("danh sach post");
-            console.log(arrCPList);
-        })
-    }
-    const handlerFavorite = (data) => {
-        setListFavorite(listFavorite.push(data));
-        firebase.database().ref('favorite/' + keyUser).set(
-            {
-                // push() sẽ bổ sung cho id
-                favorite: listFavorite
-            }, function (error) {
-                if (error) {
-                    alert('error' + error);
-                } else {
-                    alert('success')
-                }
-            });
-    }
-
     // đọc chi tiết bảng tin
     const HandlerRead = (data) => {
         setReadPost({
@@ -120,316 +95,105 @@ function Port() {
             data: data,
         })
     }
-    // xử lý Chat 
-    const [object1, setObject1] = useState("");
-    const [object2, setObject2] = useState("");
-    const handlerChat = (idYour) => {
-        console.log("id cua nguoi chat" + idYour);
-        // lấy thông tin bản thân
-        let object1 = {};
-        firebase.database().ref('users/' + keyUser).on('value', function (snapshot) {
-            object1 = snapshot.val()
-            setObject1(snapshot.val());
-        })
-        // lấy thông tin đối phương
-        let object2 = {};
-        firebase.database().ref('users/' + idYour).on('value', function (snapshot) {
-            object2 = snapshot.val()
-            setObject2(snapshot.val());
-        });
-        // tạo id Hội thoại
-        var keyMess = firebase.database().ref().child('users').push().key; // tạo key mess cho 2 người
-        // tạo đối tượng bạn cho người đang dùng 
-        const addFriend1 = {
-            idMess: keyMess,
-            idUserFriend: idYour,
-            statusRead: {
-                statusRead: true,
-            }
-        }
-        // tạo đối tượng cho người được chat
-        const addFriend2 = {
-            idMess: keyMess,
-            idUserFriend: keyUser,
-            statusRead: {
-                statusRead: false,
-            }
-        }
-        // kiểm tra xem hai bên đã có ai có bạn chưa 
-        if (object1.listFriend === undefined && object2.listFriend === undefined) {
-            // nếu chưa 
-            firebase.database().ref('users/' + keyUser).set({
-                name: object1.name,
-                email: object1.email,
-                password: object1.password,
-                avatar: object1.avatar,
-                isAdmin: object1.isAdmin,
-                isStatus: object1.isStatus,
-                listFriend: [addFriend1],
-            })
-            // cập nhật lại local
-            localStorage.setItem("account", JSON.stringify({
-                name: object1.name,
-                email: object1.email,
-                password: object1.password,
-                avatar: object1.avatar,
-                isAdmin: object1.isAdmin,
-                isStatus: object1.isStatus,
-                listFriend: [addFriend1],
-            }))
-            firebase.database().ref('users/' + idYour).set({
-                name: object2.name,
-                email: object2.email,
-                password: object2.password,
-                avatar: object2.avatar,
-                isAdmin: object2.isAdmin,
-                isStatus: object2.isStatus,
-                listFriend: [addFriend2],
-            })
-            // tin nhan dau tien
-            var date = new Date();
-            var time = date.getHours() + ':' + date.getMinutes();
-            let message = {
-                idUser: keyUser,
-                type: "text",
-                mess: 'xin chao',
-                time: time,
-                date: date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
-            }
-            firebase.database().ref('listMessage/' + keyMess).set({
-                message: [message]
+    // handler search 
+    // const handlerSearch = (param) => {
+    //     let text = param.target.value;
+    //     console.log(text);
+    //     if (text === "") {
+    //         setListPost(listPost2);
+    //     } else {
+    //         let array = listPost2.filter((item) => {
+    //             return item.address.toLowerCase().includes(text.toLowerCase());
+    //         });
+    //         setListPost(array);
+    //     }
+    // }
+    const handlerFilter = (param) => {
+        let text = param.target.value;
+        setValueOption(text)
+        if (text === "all") {
+            setListPost(listPost2);
+        } else {
+            let array = listPost2.filter((item) => {
+                return item.province.toLowerCase().includes(text.toLowerCase());
             });
-            window.location = "http://localhost:3000/home"
-        } else if (object1.listFriend !== undefined && object2.listFriend === undefined) {
-            console.log("case1")
-            console.log(object1.listFriend);
-            let listFriendMe = object1.listFriend // lấy danh sách friend me chuẩn bị cập nhật lại
-            listFriendMe.push(addFriend1);
-
-            firebase.database().ref('users/' + keyUser).set({
-                name: object1.name,
-                email: object1.email,
-                password: object1.password,
-                avatar: object1.avatar,
-                isAdmin: object1.isAdmin,
-                isStatus: object1.isStatus,
-                listFriend: listFriendMe,
-            })
-            console.log(
-                {
-                    name: object1.name,
-                    email: object1.email,
-                    password: object1.password,
-                    avatar: object1.avatar,
-                    isAdmin: object1.isAdmin,
-                    isStatus: object1.isStatus,
-                    listFriend: listFriendMe,
-                }
-            )
-            // cập nhật lại local
-            localStorage.setItem("account", JSON.stringify({
-                name: object1.name,
-                email: object1.email,
-                password: object1.password,
-                avatar: object1.avatar,
-                isAdmin: object1.isAdmin,
-                isStatus: object1.isStatus,
-                listFriend: listFriendMe,
-            }))
-            firebase.database().ref('users/' + idYour).set({
-                name: object2.name,
-                email: object2.email,
-                password: object2.password,
-                avatar: object2.avatar,
-                isAdmin: object2.isAdmin,
-                isStatus: object2.isStatus,
-                listFriend: [addFriend2],
-            }
-            )
-            console.log({
-                name: object2.name,
-                email: object2.email,
-                password: object2.password,
-                avatar: object2.avatar,
-                isAdmin: object2.isAdmin,
-                isStatus: object2.isStatus,
-                listFriend: [addFriend2],
-            })
-            // tin nhan dau tien
-            var date = new Date();
-            var time = date.getHours() + ':' + date.getMinutes();
-            let message = {
-                idUser: keyUser,
-                type: "text",
-                mess: 'xin chao',
-                time: time,
-                date: date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
-            }
-            firebase.database().ref('listMessage/' + keyMess).set({
-                message: [message]
-            });
-            window.location = "http://localhost:3000/home"
-        } else if (object1.listFriend === undefined && object2.listFriend !== undefined) {
-            console.log("case2")
-            console.log(object2.listFriend);
-            let listFriendYou = object2.listFriend // lấy danh sách friend me chuẩn bị cập nhật lại
-            listFriendYou.push(addFriend2);
-
-            firebase.database().ref('users/' + keyUser).set({
-                name: object1.name,
-                email: object1.email,
-                password: object1.password,
-                avatar: object1.avatar,
-                isAdmin: object1.isAdmin,
-                isStatus: object1.isStatus,
-                listFriend: addFriend1,
-            })
-            console.log(
-                {
-                    name: object1.name,
-                    email: object1.email,
-                    password: object1.password,
-                    avatar: object1.avatar,
-                    isAdmin: object1.isAdmin,
-                    isStatus: object1.isStatus,
-                    listFriend: addFriend1,
-                }
-            )
-            // cập nhật lại local
-            localStorage.setItem("account", JSON.stringify({
-                name: object1.name,
-                email: object1.email,
-                password: object1.password,
-                avatar: object1.avatar,
-                isAdmin: object1.isAdmin,
-                isStatus: object1.isStatus,
-                listFriend: addFriend1,
-            }))
-            firebase.database().ref('users/' + idYour).set({
-                name: object2.name,
-                email: object2.email,
-                password: object2.password,
-                avatar: object2.avatar,
-                isAdmin: object2.isAdmin,
-                isStatus: object2.isStatus,
-                listFriend: listFriendYou,
-            }
-            )
-            console.log({
-                name: object2.name,
-                email: object2.email,
-                password: object2.password,
-                avatar: object2.avatar,
-                isAdmin: object2.isAdmin,
-                isStatus: object2.isStatus,
-                listFriend: listFriendYou,
-            })
-            // tin nhan dau tien
-            var date = new Date();
-            var time = date.getHours() + ':' + date.getMinutes();
-            let message = {
-                idUser: keyUser,
-                type: "text",
-                mess: 'xin chao',
-                time: time,
-                date: date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
-            }
-            firebase.database().ref('listMessage/' + keyMess).set({
-                message: [message]
-            });
-            window.location = "http://localhost:3000/home"
-        } else if (object1.listFriend !== undefined && object2.listFriend !== undefined) {
-            let listFriendMe = object1.listFriend;
-            let listFriendYou = object2.listFriend;
-            let len1 = listFriendMe.length;
-            let len2 = listFriendYou.length;
-            let ktID = false;
-            let idMess = '';
-
-            for (let i = 0; i < len1; i++) {
-                if (listFriendMe[i].idUserFriend == idYour) {
-                    idMess = listFriendMe[i].idMess;
-                    ktID = true;
-                    break;
-                }
-            }
-            if (ktID) {
-                console.log('co');
-            } else {
-                // không trung nên add cho cả 2 người 
-                let listFriendMe = object1.listFriend; // chuan bi add them 1 ban cho nguoi dang dung
-                listFriendMe.push(addFriend1);
-                firebase.database().ref('users/' + keyUser).set({
-                    name: object1.name,
-                    email: object1.email,
-                    password: object1.password,
-                    avatar: object1.avatar,
-                    isAdmin: object1.isAdmin,
-                    isStatus: object1.isStatus,
-                    listFriend: listFriendMe,
-                })
-                let listFriendYou = object2.listFriend // lấy danh sách friend me chuẩn bị cập nhật lại
-                listFriendYou.push(addFriend2);
-                firebase.database().ref('users/' + idYour).set({
-                    name: object2.name,
-                    email: object2.email,
-                    password: object2.password,
-                    avatar: object2.avatar,
-                    isAdmin: object2.isAdmin,
-                    isStatus: object2.isStatus,
-                    listFriend: listFriendYou,
-                })
-                // tin nhan dau tien
-                var date = new Date();
-                var time = date.getHours() + ':' + date.getMinutes();
-                let message = {
-                    idUser: keyUser,
-                    type: "text",
-                    mess: 'xin chao',
-                    time: time,
-                    date: date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
-                }
-                firebase.database().ref('listMessage/' + keyMess).set({
-                    message: [message]
-                });
-            }
+            setListPost(array);
         }
-
     }
+    // xủ lý pagination 
+    const handlerPagination = (pos) => {
+        console.log(pos);
+        setNumPagination(pos);
+        setListPost(listPost2.slice((pos * 4 - 4), pos * 4));
+    }
+    const handlerPaginationNext = () => {
+        if (numPagination === listPagination.length) {
+            handlerPagination(numPagination)
+        } else {
+            let pos = numPagination + 1;
+            handlerPagination(pos);
+        }
+    }
+    const handlerPaginationPrevious = () => {
+        if (numPagination === 1) {
+            handlerPagination(1)
+        } else {
+            let pos = numPagination - 1;
+            handlerPagination(pos);
+        }
+    }
+
     const HandlerVisible = () => {
         if (readPost.read) {
-            return <Description data={readPost.data} handlerFavorite={handlerFavorite} handlerChat={handlerChat}></Description>
+            return <Description {...readPost.data} idUser={idUser}></Description>
         } else {
             return <div className="boxPost">
                 <div className="filterData">
-                    {/* <select className="filterData_select" name="price" id="price">
-<option value="increase">increase</option>
-<option value="reduce">reduce</option>
-</select> */}
-                    <BoxSelect></BoxSelect>
-                    <BoxSearch></BoxSearch>
+                    <p>province</p>
+                    <BoxSelect handlerFilter={handlerFilter} valueOption={valueOption}></BoxSelect>
                 </div>
                 <p className="boxTitle">Post</p>
                 <div className="boxCard">
                     {
-                        listPost === null || listPost.length === 0
-                            ? <p>khong co bai viet nao dc dang</p>
-                            :
-                            listPost.map((item, index) => {
-                                return <BoxCardItem key={index} data={item} handler={HandlerRead}></BoxCardItem>
-                            })
+                        listPost === null
+                            ? <img src={loading} style={{ width: '200px' }} alt="" />
+                            : listPost.length === 0
+                                ? <p>khong co bai viet nao dc dang</p>
+                                :
+                                listPost.map((item, index) => {
+                                    return <BoxCardItem key={index} {...item}
+                                        handler={HandlerRead}
+                                    ></BoxCardItem>
+                                })
                     }
                 </div>
-                <Pagination></Pagination>
+                <div className="pagination">
+                    <span onClick={() => handlerPaginationPrevious()}>«</span>
+                    {listPagination.map((item, index) => {
+                        if (numPagination === (index + 1)) {
+                            return <span key={item.num} className="active" onClick={() => handlerPagination(item.num)}>{item.num}</span>
+                        } else {
+                            return <span key={item.num} onClick={() => handlerPagination(item.num)}>{item.num}</span>
+                        }
+                    }
+                    )}
+                    <span onClick={() => handlerPaginationNext()}>»</span>
+                </div>
                 <p className="boxTitle">Featured Posts</p>
                 <div className="slider">
                     <Slider {...settings}>
-                        {/* <BoxCardItem></BoxCardItem>
-        <BoxCardItem></BoxCardItem>
-        <BoxCardItem></BoxCardItem>
-        <BoxCardItem></BoxCardItem>
-        <BoxCardItem></BoxCardItem>
-        <BoxCardItem></BoxCardItem> */}
+                        {
+                            listPost2 === null
+                                ? <img src={loading} style={{ width: '200px' }} alt="" />
+                                : listPost2.length === 0
+                                    ? <p>khong co bai viet nao dc dang</p>
+                                    :
+                                    listPost2.map((item, index) => {
+                                        return <BoxCardItem key={index} {...item}
+                                            handler={HandlerRead}
+                                        ></BoxCardItem>
+                                    })
+                        }
                     </Slider>
                 </div>
             </div>
@@ -438,6 +202,7 @@ function Port() {
     return (
         <div className="colSection">
             <HandlerVisible></HandlerVisible>
+            <ToastContainer />
         </div>
     )
 }

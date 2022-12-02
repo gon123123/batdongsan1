@@ -1,21 +1,78 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'boxicons'
 import bannerGif from '../asset/video/bannerGif.gif';
 import contactGif from '../asset/video/contact.gif';
 import '../css/home.css';
-import about1 from '../asset/image/about1.jpg'
-import about2 from '../asset/image/about2.jpg'
-import personnel1 from '../asset/image/personnel1.jpg'
+import about1 from '../asset/image/about1.jpg';
+import about2 from '../asset/image/about2.jpg';
+import personnel1 from '../asset/image/personnel1.jpg';
 
+import firebase from "firebase/app";
+import { connectDatabase } from '../helper/configDatabase';
+
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function Home() {
+    let navigate = useNavigate();
+    useEffect(() => {
+        connectDatabase();
+    }, []);
+
+    const formik = useFormik({
+        initialValues: {
+            name: "",
+            email: "",
+            description: "",
+        },
+        validationSchema: Yup.object({
+            name: Yup.string()
+                .max(35, 'Invalid name length 😒')
+                .required('This field cannot be left blank'),
+            email: Yup.string()
+                .max(35, 'Invalid email length 😒')
+                .required('This field cannot be left blank'),
+            description: Yup.string()
+                .max(35, 'Invalid description length 😒')
+                .required('This field cannot be left blank'),
+        }),
+        onSubmit: (values) => {
+            let objRePost = {
+                name: values.name,
+                email: values.email,
+                description: values.description,
+            }
+            firebase.database().ref('report/').push().set(
+                objRePost
+                , function (err) {
+                    if (err) {
+                        alert("error: " + err);
+                    } else {
+                        toast.success('🎉 Successful response!', {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            });
+                    }
+                })
+        },
+    })
     return (
-        <div className="home">
+        <div className="home" id="first">
             <div className="container_home">
                 <div className="homeBanner">
                     <img className="banner-gif" src={bannerGif} alt="" />
                     <div className="homeTitle">
                         <h1>Choose a place to live that's right for you</h1>
-                        <button type="button" onClick={() => { }}>Start Now</button>
+                        <button type="button" onClick={() => { navigate("/register") }}>Start Now</button>
                     </div>
                 </div>
                 <section>
@@ -101,27 +158,30 @@ function Home() {
                     <h3 className="action-title" id="contacts">CONTACTS</h3>
                     <div className="contact">
                         <div className="contact_from">
-                            <div className="formInput">
-                                <label htmlFor="name" className="formInput_label">Name</label>
-                                <input type="text" className="formInput_input" placeholder='Enter ...' />
-                                <span className="formInput_error">* khong dung</span>
-                            </div>
-                            <div className="formInput">
-                                <label htmlFor="email" className="formInput_label">Email</label>
-                                <input type="email" className="formInput_input" placeholder='Enter ...' />
-                                <span className="formInput_error">* khong dung</span>
-                            </div>
-                            <div className="formInput">
-                                <label htmlFor="dess" className="formInput_label">Description</label>
-                                <textarea  className="formInput_input" name="" id="dess" cols="30" rows="5"></textarea>
-                                <span className="formInput_error">* khong dung</span>
-                            </div>
-                                <button className="contact_btn"type="button" onClick={() => { }}>Send</button>
+                            <form onSubmit={formik.handleSubmit} id="formContact">
+                                <div className="formInput">
+                                    <label htmlFor="name" className="formInput_label">Name</label>
+                                    <input type="text" id="name" className="formInput_input" placeholder='Enter ...' value={formik.values.name} onChange={formik.handleChange} />
+                                    {formik.errors.name && formik.touched.name && <span className="formInput_error">* {formik.errors.name}</span>}
+                                </div>
+                                <div className="formInput">
+                                    <label htmlFor="email" className="formInput_label">Email</label>
+                                    <input type="email" id="email" className="formInput_input" placeholder='Enter ...' value={formik.values.email} onChange={formik.handleChange} />
+                                    {formik.errors.email && formik.touched.email && <span className="formInput_error">* {formik.errors.email}</span>}
+                                </div>
+                                <div className="formInput">
+                                    <label htmlFor="description" className="formInput_label">Description</label>
+                                    <textarea className="formInput_input" name="" id="description" cols="30" rows="5" value={formik.values.description} onChange={formik.handleChange}></textarea>
+                                    {formik.errors.description && formik.touched.description && <span className="formInput_error">* {formik.errors.description}</span>}
+                                </div>
+                                <input type="submit" className="contact_btn" value="Send" />
+                            </form>
                         </div>
                         <img className="contact_Gif" src={contactGif} alt="" />
                     </div>
                 </section>
             </div>
+            <ToastContainer/>
         </div>
     )
 }

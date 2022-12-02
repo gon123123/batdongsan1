@@ -8,7 +8,7 @@ function boxAction(props) {
             return (
                 <div className="boxAction_item" onClick={() => handleActive(id)} style={{ backgroundColor: '#F5EEEE' }}>
                     <span>
-                        <box-icon type="solid" name={nameLogo} color="#141414"></box-icon>
+                        <box-icon type="solid" name={nameLogo} color="#1eb2a6"></box-icon>
                     </span>
                     <p className="Action_item-title">{title}</p>
                 </div>

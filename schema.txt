@@ -1,0 +1,364 @@
+{
+     name: {
+            paraName: ""
+        },
+        email: {
+            paraEmail: ""
+        },
+        password: {
+            paraPassword: ""
+        },
+        avatar: {
+            paraAvatar: {
+                url: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80",
+                type: "link"
+            }
+        },
+        isAdmin: {
+            paraIsAdmin: false,
+        },
+        isStatus: {
+            paraIsStatus: true,
+        },
+        listFriend: [],
+    }
+    
+
+
+    import React, { useEffect, useState } from 'react'
+import Slider from 'react-slick';
+
+import 'boxicons';
+
+import '../css/descriptionUpdate.css'
+import anh from '../asset/image/anh.jpg';
+
+import firebase from "firebase/app";
+import { connectDatabase } from '../helper/configDatabase';
+
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function NewPost(props) {
+    const d = new Date();
+    const [fileImage, setFileImage] = useState(null);
+    const [chooseFile, setChooseFile] = useState(true);
+    useEffect(() => {
+        connectDatabase();
+    }, []);
+
+    const newPost = useFormik({
+        initialValues: {
+            title: "",
+            address: "",
+            price: 0,
+            area: 0,
+            star: 0,
+            province: "",
+            description: "",
+            // image
+            // date 
+        },
+        validationSchema: Yup.object({
+            title: Yup.string()
+                .min(10, 'Title is not at least 30 characters long')
+                .max(1000, 'Maximum length 1000 characters 😒')
+                .required('This field cannot be left blank'),
+            address: Yup.string()
+                .min(10, 'address is not at least 30 characters long')
+                .max(1000, 'Maximum length 1000 characters 😒')
+                .required('This field cannot be left blank'),
+            price: Yup.number()
+                .min(1000, 'amount must be greater than or equal to 1000')
+                .required('This field cannot be left blank'),
+            area: Yup.number()
+                .min(1, 'diện tích > 1 ')
+                .required('This field cannot be left blank'),
+            star: Yup.number()
+                .min(1, 'Rate from 1 to 5 stars')
+                .required('This field cannot be left blank'),
+            province: Yup.string()
+                .required('This field cannot be left blank'),
+            description: Yup.string()
+                .min(10, 'length must be more than 10 characters')
+                .max(1500, 'Maximum length 1000 characters 😒')
+                .required('This field cannot be left blank'),
+        }),
+        onSubmit: (values) => {
+            // console.log(values);
+            console.log({ ...values, date: d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear(), image: fileImage.length })
+        }
+    })
+    var settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 3500,
+        swipeToSlide: true,
+        dotsClass: "slick-dots slick-thumb",
+    };
+
+    // const handlerChoseFile = (event) => {
+    //     setFileImage(null);
+    //     console.log(event.target.files)
+    //     const dataFileImage = [];
+    //     let len = (event.target.files).length;
+    //     for (let i = 0; i < len; i++) {
+    //         dataFileImage.push({ url: convert2base64(event.target.files[i]), type: "local" })
+    //         dataFileImage.push({ url: getBase64(fileObjectFromInput, function (base64Data) {
+    //     return base64Data;
+    // }), type: "local" })
+    //     }
+    //     setFileImage(dataFileImage);
+    //     // lay img cho data ba
+    //     setDataItem({ ...dataItem, image: dataFileImage });
+    // }
+    const convert2base64 = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            handlerChoseFile(reader.result.toString())
+        }
+        reader.readAsDataURL(file);
+    }
+    const handlerChoseFile = (data) => {
+        if (fileImage === null) {
+            setFileImage([{ url: data, type: "local" }]);
+        } else {
+            let dataImage = fileImage;
+            dataImage.push({ url: data, type: "local" })
+            setFileImage(dataImage);
+            console.log(fileImage.length);
+        }
+        setChooseFile(!chooseFile);
+    }
+    const handleDelImage = (id) => {
+        setFileImage(fileImage.filter((file, index) => index != id));
+    }
+    return (
+        <div className="boxDescription" >
+            <div className="input_ChooseFile">
+                <label type="button" htmlFor="chooseFile" className="btn_choose">Choose Image</label>
+                <input style={{ display: 'none' }} id="chooseFile" type="file" name="file" onChange={(e) => convert2base64(e)} accept="image/jpeg, image/png," />
+                <button type="button" className="btn_choose" onClick={() => {
+                    setFileImage(null)
+                }}>Clear</button>
+            </div>
+            <div className="slickCarousel">
+                <Slider {...settings}>
+                    {
+                        fileImage !== null &&
+                        fileImage.map((item, index) => <img key={index} src={item.url} id="up" alt="" />)
+                    }
+                </Slider>
+                {fileImage ===null || fileImage.length === 0 && <span className="formInput_error">* You haven't selected a photo yet</span>}
+            </div>
+            <div className="imageSelect">
+                {
+                    fileImage !== null &&
+                    fileImage.map((item, index) =>
+                        <div className="delImage" key={index}>
+                            <span onClick={() => handleDelImage(index)}>+</span>
+                            <img src={item.url} alt="" style={{ width: "100px", height: "70px" }} />
+                        </div>
+                    )
+                }
+            </div>
+            <form onSubmit={newPost.handleSubmit}>
+                <label className="text textTitle" htmlFor="title">Title</label>
+                <input type="text" className="textInput textInputTitle" id="title" value={newPost.values.title} onChange={newPost.handleChange} />
+                {newPost.errors.title && newPost.touched.title && <span className="formInput_error">* {newPost.errors.title}</span>}
+                <p className="text date">Date : {d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear()}</p>
+                <label className="text textTitle" htmlFor="address">Address : </label>
+                <input type="text" className="textInput textInputTitle" id="address" value={newPost.values.address} onChange={newPost.handleChange} />
+                {newPost.errors.address && newPost.touched.address && <span className="formInput_error">* {newPost.errors.address}</span>}
+                <div className="infoImportant">
+                    <div className="boxPrice">
+                        <label className="text infoImportant_title" id="price">Price  <span className="text infoImportant_text"> $</span></label>
+                        <input type="number" className="textInput textInputPrice" id="price" value={newPost.values.price} onChange={newPost.handleChange} />
+                        {newPost.errors.price && newPost.touched.price && <span className="formInput_error">* {newPost.errors.price}</span>}
+                    </div>
+                    <div className="boxArea">
+                        <label className="text infoImportant_title" htmlFor="area">Area <span className="text infoImportant_text"> m<sup>2</sup></span></label>
+                        <input type="text" className="textInput textInputArea" id="area" value={newPost.values.area} onChange={newPost.handleChange} />
+                        {newPost.errors.area && newPost.touched.area && <span className="formInput_error">* {newPost.errors.area}</span>}
+                    </div>
+                    <div className="boxArea">
+                        <label className="text infoImportant_title" htmlFor="star">Star</label>
+                        <input type="number" className="textInput textInputStar" id="star" max="5" min="1" value={newPost.values.star} onChange={newPost.handleChange} />
+                        {newPost.errors.star && newPost.touched.star && <span className="formInput_error">* {newPost.errors.star}</span>}
+                    </div>
+                    <div className="boxProvince">
+                        <label className="text infoImportant_title" htmlFor="province">Province</label>
+                        {/* lo maf chon lai */}
+                        <select className="filterData_select" name="province" id="province" value={newPost.values.province} onChange={newPost.handleChange}>
+                            <option value="Quang tri">quang tri</option>
+                            <option value="Da nang">da nang</option>
+                        </select>
+                        {newPost.errors.province && newPost.touched.province && <span className="formInput_error">* {newPost.errors.province}</span>}
+                    </div>
+                </div>
+                <label className="text textTitle" htmlFor="description">Description</label>
+                <textarea className="textInput textAreaDescription" name="description" id="description" cols="30" rows="10" value={newPost.values.description} onChange={newPost.handleChange}></textarea>
+                {newPost.errors.description && newPost.touched.description && <span className="formInput_error">* {newPost.errors.description}</span>}
+                <div className="btn_description">
+                    <p className="btn_description-text" ></p>
+                    <input type="submit" className="btn_update" value="New Post" />
+                </div>
+            </form>
+        </div >
+    )
+}
+
+export default NewPost
+
+
+// cấu trúc đợi được xác nhận 
+{/* <div className="boxTable">
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>num</th>
+                                    <th>name</th>
+                                    <th>process</th>
+                                    <th>start</th>
+                                    <th>view</th>
+                                    <th>del</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Ban ccmn nhaf tro thue 5 tang..</td>
+                                    <td>success</td>
+                                    <td>
+                                        <div className="star">
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" className="btn_table">view</button>
+                                    </td>
+                                    <td>
+                                        <button type="button" className="btn_table del">del</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Ban ccmn nhaf tro thue 5 tang..</td>
+                                    <td>success</td>
+                                    <td>
+                                        <div className="star">
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>&nbsp;
+                                            <box-icon name='star' type='solid' color="#FFA34D" size="xs"> </box-icon>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" className="btn_table">view</button>
+                                    </td>
+                                    <td>
+                                        <button type="button" className="btn_table del">del</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <Pagination></Pagination> */}
+
+// phần message
+ // <div className="colSection">
+        //     {actionVisible.modal ?
+        //         <Modal actionVisible={actionVisible} handlerCallVoice={handlerCallVoice} handlerVideo={handlerVideo} handlerMic={handlerMic}></Modal>
+        //         : <div className="visibleChat">
+        //             <div className="boxChat">
+        //                 {dataBoxChat !== null &&
+        //                     <>
+        //                         <div className="chatTitle">
+        //                             <div className="infoFriend">
+        //                                 <img src={dataBoxChat.avatar.paraAvatar.url} alt="" />
+        //                                 <p>{dataBoxChat.name.paraName}</p>
+        //                                 {dataBoxChat.isStatus.paraIsStatus === true
+        //                                     ? <span></span>
+        //                                     : <span style={{ backgroundColor: "#FFA34D" }}></span>
+        //                                 }
+        //                             </div>
+        //                             <div className="callFriend">
+        //                                 <button type="button" onClick={() => handlerCallVoice({ modal: true, video: false })}>
+        //                                     <box-icon name='phone-call' type='solid' color="#FFA34D" ></box-icon>
+        //                                 </button>
+        //                                 <button type="button" onClick={() => handlerCallVoice({ modal: true, video: true })}>
+        //                                     <box-icon name='video' type='solid' color="#FFA34D" ></box-icon>
+        //                                 </button>
+        //                             </div>
+        //                         </div>
+        //                         <div className="boxMessage" id="messBottom">
+        //                             {/* {listMessage !== null &&
+        //                                 // <div><p className="messageRight">{listMessage[0].mess}<span className="time">{listMessage[0].time}</span></p></div>
+        //                                 listMessage.map((item, index) => <div key={index}><p className="messageRight">{item.mess}<span className="time">{item.time}</span></p></div>
+        //                                 )
+        //                             } */}
+        //                             {listMessage !== null &&
+        //                                 listMessage.map((item, index) =>
+        //                                     item.type === "text"
+        //                                         ?
+        //                                         item.idUser === keyUser
+        //                                             ? <div key={index}><p className="messageRight">{item.mess}<span className="time">{item.time}</span></p></div>
+        //                                             : <div key={index}><p className="messageLeft">{item.mess}<span className="time">{item.time}</span></p></div>
+        //                                         :
+        //                                         item.idUser === keyUser
+        //                                             ? <p className="messageRight" key={index}>
+        //                                                 <span className="messageCall">
+        //                                                     <box-icon name='phone-outgoing' type='solid' color="#F67575"></box-icon>
+        //                                                     <span>&nbsp;&nbsp; you made the call</span>
+        //                                                 </span>
+        //                                                 <span className="time">12:78</span>
+        //                                             </p>
+        //                                             : <p className="messageLeft" key={index}>
+        //                                                 <span className="messageCall">
+        //                                                     <span>i want to call you &nbsp;&nbsp;</span>
+        //                                                     <box-icon name='phone' type='solid' animation='tada' color="#F67575"></box-icon>
+        //                                                 </span>
+        //                                                 <button className="receiveCall">receive call</button>
+        //                                                 <span className="time">12:78</span>
+        //                                             </p>
+        //                                 )
+        //                             }
+        //                             <p className="messageRight" style={{ backgroundColor: "#FFFFFF" }}></p>
+        //                         </div>
+        //                         <div className="boxSendMess">
+        //                             <textarea name="" id="" cols="30" rows="1" onChange={(e) => handlerMessage(e)} value={messageTextarea}></textarea>
+        //                             <button type="button" onClick={() => sendMessage()}><box-icon name='send' type='solid' size="md" color="#1eb2a6"></box-icon></button>
+        //                         </div>
+        //                     </>
+        //                 }
+        //             </div>
+        //             <div className="boxFriend">
+        //                 <div className="boxSearch">
+        //                     <input className="searchInput" type="text" name="title" onChange={() => { }} placeholder="enter title..." />
+        //                     <div className="search_icon">
+        //                         <box-icon name='search' color="#FFFFFF"></box-icon>
+        //                     </div>
+        //                 </div>
+        //                 <div className="arrData_friend">
+        //                     {dataUser === null
+        //                         ? <p>khong co ai</p>
+        //                         : dataUser.listFriend !== undefined && dataUser.listFriend.map((item, index) => <ItemUser key={index} item={item} handlerMessChatVisible={handlerMessChatVisible}></ItemUser>)
+        //                     }
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     }
+        // </div>

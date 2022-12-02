@@ -3,67 +3,57 @@ import React, { useEffect, useState } from 'react'
 import anh from '../asset/image/anh.jpg'
 
 import firebase from "firebase/app";
-// import "firebase/auth";
-import "firebase/database";
-import "firebase/firestore";
-import "firebase/functions";
-import "firebase/storage";
-function ItemUser(props) {
-    console.log(props.item);
-    const { idMess, idUserFriend, statusRead } = props.item;
+import { connectDatabase } from '../helper/configDatabase';
+
+function ItemUser({ idFriend, name, idMess, idUser, handlerMessChatVisible }) {
     const [dataFriend, setDataFriend] = useState(null);
     const [listMessage, setListMessage] = useState(null);
     useEffect(() => {
-        const firebaseConfig = {
-            apiKey: "AIzaSyCi03lnEWgFK61CV32HJaPsYC8uohWG2AA",
-            authDomain: "batdongsanweb.firebaseapp.com",
-            projectId: "batdongsanweb",
-            storageBucket: "batdongsanweb.appspot.com",
-            messagingSenderId: "853795324769",
-            appId: "1:853795324769:web:6128febc029646f2763b20",
-            measurementId: "G-4DH9E26NJV"
-        };
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log("ket noi thanh cong myPort");
+        // lấy dữ liệu của friend
+        const getDataFriend = async () => {
+            firebase.database().ref('users/' + idFriend).on('value', function (snapshot) {
+                setDataFriend(snapshot.val());
+            });
         }
+        const getDataMessage = async () => {
+            await firebase.database().ref('listMessage/' + idMess).on('value', function (snapshot) {
+                let array = [];
+                snapshot.forEach(function (item) {
+                    var childData = item.val();
+                    array.push(childData);
+                })
+                console.log(array);
+                setListMessage(array);
+            });
+        }
+        connectDatabase();
         getDataFriend();
         getDataMessage();
     }, []);
-    const getDataFriend = () => {
-        firebase.database().ref('users/' + idUserFriend).on('value', function (snapshot) {
-            let data = {}
-            data = snapshot.val()
-            setDataFriend(data);
-        });
-        console.log(dataFriend);
-    }
-    const getDataMessage = () => {
-        let mess = []
-        firebase.database().ref('listMessage/' + idMess).on('value', function (snapshot) {
-            mess = snapshot.val()
-            setListMessage(mess.message);
-        });
-        console.log(listMessage);
-    }
     return (
         dataFriend !== null &&
-        <div className="friendItem" onClick={() => props.handlerMessChatVisible(dataFriend,idMess)}>
+        <div className="friendItem" onClick={() => handlerMessChatVisible(dataFriend, idMess, idFriend)}>
             <div className="boxAvatar">
-                <img src={dataFriend.avatar.paraAvatar.url} alt="" />
-                {dataFriend.isStatus.paraIsStatus === true ?
+                <img src={dataFriend.avatar.url} alt="" />
+                {dataFriend.isStatus === true ?
                     <span></span>
                     : <span style={{ backgroundColor: "#FFA34D" }}></span>
                 }
             </div>
             <div className="friend_mess">
-                <span>{dataFriend.name.paraName}</span>
-                {listMessage !== null &&
-                    <p style={{ fontWeight: "600" }}>{listMessage[listMessage.length - 1].mess}</p>
+                <span>{name}</span>
+                {
+                    (listMessage !== null && listMessage.length !== 0)
+                        ?
+                        listMessage[listMessage.length - 1].type == "text"
+                            ? listMessage[listMessage.length - 1].idUser === idUser
+                                ? <p >{listMessage[listMessage.length - 1].mess}</p>
+                                : <p style={{ fontWeight: "600" }}>{listMessage[listMessage.length - 1].mess}</p>
+                            : listMessage[listMessage.length - 1].idUser === idUser
+                                ? <span style={{ fontWeight: "600" }}>calling <box-icon name='phone' type='solid' animation='tada' color="#F67575" size="xs"></box-icon></span>
+                                : <span style={{ fontWeight: "600" }}>receive call <box-icon name='bell-ring' type='solid' animation='tada' color="#F67575" size="xs"></box-icon></span>
+                        : null
                 }
-                {/* <p style={{ fontWeight : "600" }}>chao cac ban nha Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat, deleniti.</p> */}
-                {/* <span style={{ fontWeight: "600" }}>receive call <box-icon name='bell-ring' type='solid' animation='tada' color="#F67575" size="xs"></box-icon></span> */}
-                {/* <p>chao cac ban nha Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat, deleniti.</p> */}
             </div>
         </div>
     )

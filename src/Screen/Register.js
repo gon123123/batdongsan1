@@ -1,101 +1,127 @@
-import React, { useEffect, useState } from 'react'
-import '../css/LogRes.css'
-import facebook from '../asset/image/facebook.png'
-import google from '../asset/image/search.png'
-import anh from '../asset/image/anh.jpg'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import '../css/LogRes.css';
+import facebook from '../asset/image/facebook.png';
+import google from '../asset/image/search.png';
+import anh from '../asset/image/anh.jpg';
 
 import firebase from "firebase/app";
-// import "firebase/auth";
-import "firebase/database";
-import "firebase/firestore";
-import "firebase/functions";
-import "firebase/storage";
+import { connectDatabase } from '../helper/configDatabase';
 
-function Register(props) {
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function Register({ setEmailUserLogin }) {
+    let navigate = useNavigate();
     const [listUsers, setListUsers] = useState(null);
-
-    // const data = {
-    //     name: "minh tuan",
-    //     email: "bmt@gmail.com",
-    //     password: "12345678",
-    //     avatar: {
-    //         paraAvatar: {
-    //             url: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80",
-    //             type: "link"
-    //         }
-    //     },
-    //     isAdmin: {
-    //         paraIsAdmin: true,
-    //     },
-    //     isStatus: {
-    //         paraIsStatus: true,
-    //     },
-    //     listFriend: [
-    //         {
-    //             idMess: "jwfaojweijfpoaew",
-    //             idUserFriend: "jijejoigogj",
-    //             statusRead: {
-    //                 paraStatus: false
-    //             }
-    //         }
-    //     ],
-    // }
-    // console.log(data);
-    // const data2 = { ...data, password: { paraPassword: "emochamhoi" }, isAdmin: { paraIsAdmin: false }, avatar: { paraAvatar: { url: "http://", type: 'base64' } } }
-    // console.log(data2);
     useEffect(() => {
-        const firebaseConfig = {
-            apiKey: "AIzaSyCi03lnEWgFK61CV32HJaPsYC8uohWG2AA",
-            authDomain: "batdongsanweb.firebaseapp.com",
-            projectId: "batdongsanweb",
-            storageBucket: "batdongsanweb.appspot.com",
-            messagingSenderId: "853795324769",
-            appId: "1:853795324769:web:6128febc029646f2763b20",
-            measurementId: "G-4DH9E26NJV"
-        };
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log("ket noi thanh cong");
+
+        const getListUser = async () => {
+            await firebase.database().ref('users/').on('value', function (snapshot) {
+                let array = [];
+                snapshot.forEach(function (item) {
+                    var childData = item.val();
+                    array.push(childData);
+                })
+                setListUsers(array);
+            })
         }
+        connectDatabase();
         getListUser();
     }, []);
-    const getListUser = () => {
-        firebase.database().ref('users/').on('value', (snapshot) => {
-            let arrCPList = []
-            snapshot.forEach(function (itemUser) {
-                var childData = itemUser.val();
-                arrCPList.push({
-                    idUser: itemUser.key,
-                    name: childData.name.paraName,
-                    email: childData.email.paraEmail,
-                    password: childData.password.paraPassword,
-                    avatar: childData.avatar.paraAvatar,
-                    isAdmin: childData.isAdmin.paraIsAdmin,
-                    isStatus: childData.isStatus.paraIsStatus,
-                    listFriend: childData.listFriend,
-                })
-            })
-            setListUsers(arrCPList);
-            console.log(listUsers);
-        })
-    }
+
+    const register = useFormik({
+        initialValues: {
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+        },
+        validationSchema: Yup.object({
+            name: Yup.string()
+                .min(5, 'Invalid name length 😒')
+                .max(35, 'Invalid name length 😒')
+                .required('This field cannot be left blank'),
+            email: Yup.string()
+                .max(35, 'Invalid email length 😒')
+                .required('This field cannot be left blank'),
+            password: Yup.string()
+                .min(8, 'Invalid name length 😒')
+                .max(35, 'Invalid email length 😒')
+                .required('This field cannot be left blank'),
+            confirmPassword: Yup.string()
+                .oneOf([Yup.ref('password')], 'Password does not match !')
+                .required('This field cannot be left blank'),
+        }),
+        onSubmit: (values) => {
+            console.log(values);
+            // kiem tra trung lap tai khoan
+            if (listUsers !== null) {
+                let kt = listUsers.some((item) => item.email === values.email);
+                if (kt) {
+                    toast.error('🔥 Duplicate account!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+                } else {
+                    let objNewUser = {
+                        name: values.name,
+                        email: values.email,
+                        password: values.password,
+                        avatar: {
+                            url: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80",
+                            type: "link"
+                        },
+                        isAdmin: false,
+                        isStatus: true,
+                        listFriend: [],
+                    }
+                    firebase.database().ref('users/').push().set(
+                        objNewUser
+                        , function (err) {
+                            if (err) {
+                                alert("error: " + err);
+                            } else {
+                                setEmailUserLogin(values.email)
+                            }
+                        })
+                }
+            }
+        }
+    })
     return (
         <div className="box">
             <div className="colLeft">
                 <img src={anh} alt="" />
             </div>
             <div className="colRight">
+                <p className="backHome" onClick={() => navigate('/')}>
+                    Back Home
+                </p>
                 <h3>Register</h3>
-                <form action="/home">
+                <form onSubmit={register.handleSubmit}>
                     <label htmlFor="name">Name</label>
-                    <input type="text" placeholder="Enter name" onChange={(e) => props.setNewAccountUser({ ...props.newAccountUser, name: { paraName: e.target.value } })} />
+                    <input type="text" id="name" placeholder="Enter name" value={register.values.name} onChange={register.handleChange} />
+                    {register.errors.name && register.touched.name && <span className="formInput_error1">* {register.errors.name}</span>}
                     <label htmlFor="email">Email </label>
-                    <input type="text" placeholder="Enter email" onChange={(e) => props.setNewAccountUser({ ...props.newAccountUser, email: { paraEmail: e.target.value } })} />
-                    <label htmlFor="pass">Password</label>
-                    <input type="text" placeholder="password" onChange={(e) => props.setNewAccountUser({ ...props.newAccountUser, password: { paraPassword: e.target.value } })} />
-                    <label htmlFor="pass">Confirm password</label>
-                    <input type="text" placeholder="password" />
-                    <input type="button" value="Sign In" onClick={() => props.addAccount(props.newAccountUser) } />
+                    <input type="email" id="email" placeholder="Enter email" value={register.values.email} onChange={register.handleChange} />
+                    {register.errors.email && register.touched.email && <span className="formInput_error1">* {register.errors.email}</span>}
+                    <label htmlFor="password">Password</label>
+                    <input type="password" id="password" autoComplete="on" value={register.values.password} onChange={register.handleChange} />
+                    {register.errors.password && register.touched.password && <span className="formInput_error1">* {register.errors.password}</span>}
+                    <label htmlFor="confirmPassword">Confirm password</label>
+                    <input type="password" id="confirmPassword" autoComplete="on" value={register.values.confirmPassword} onChange={register.handleChange} />
+                    {register.errors.confirmPassword && register.touched.confirmPassword && <span className="formInput_error1">* {register.errors.confirmPassword}</span>}
+                    <input type="submit" value="Sign In" />
                 </form>
                 <div className="or">
                     <span></span>
@@ -109,10 +135,11 @@ function Register(props) {
                 <div className="or">
                     <p>Forgot or password ?</p>
                 </div>
-                <a href="/login">
+                <p className="link" onClick={() => navigate('/login')}>
                     you already have an account? login here
-                </a>
+                </p>
             </div>
+            <ToastContainer />
         </div>
     )
 }

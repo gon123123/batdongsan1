@@ -1,12 +1,15 @@
 import React from 'react'
 import '../css/boxSelect.css'
-function boxSelect() {
+
+const arrayProvinces = ['all', 'quang nam', 'da nang', 'quang ngai', 'hue', 'quang tri']
+function BoxSelect({ valueOption, handlerFilter }) {
     return (
-        <select className="filterData_select" name="province" id="province">
-            <option value="da nang">da nang</option>
-            <option value="quang tri">quang tri</option>
+        <select className="filterData_select" name="province" id="province" onChange={(e) =>  handlerFilter(e)} value={valueOption}>
+            {
+                arrayProvinces.map(province => <option key={province} value={province}>{province}</option>)
+            }
         </select>
     )
 }
 
-export default boxSelect
+export default BoxSelect

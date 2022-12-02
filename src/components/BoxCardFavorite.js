@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
-
 import '../css/boxCardItem.css'
+
 import anhCard from '../asset/image/about1.jpg';
 
 import firebase from "firebase/app";
 import { connectDatabase } from '../helper/configDatabase';
 
 import { ToastContainer, toast } from 'react-toastify';
-function BoxCard2button({ idMyPost, image, title, date, address, price, area, star, province, description, idUser, handler }) {
+import 'react-toastify/dist/ReactToastify.css';
+function BoxCardFavorite({ keyItemFavorite, name, avatar, idSell, image, title, date, address, price, area, star, province, description, idUser, handler }) {
     useEffect(() => {
         connectDatabase();
     }, []);
@@ -16,7 +17,7 @@ function BoxCard2button({ idMyPost, image, title, date, address, price, area, st
     for (let i = 0; i < star; i++) {
         item.push(starSTR);
     }
-    const handleDelMyPost = () => {
+    const handleDelPostFavorite = () => {
         toast.warning('😭 Post deleted!', {
             position: "top-right",
             autoClose: 2000,
@@ -27,8 +28,7 @@ function BoxCard2button({ idMyPost, image, title, date, address, price, area, st
             progress: undefined,
             theme: "light",
         });
-        firebase.database().ref('myPost/' + idUser + '/post/' + idMyPost).remove();
-        firebase.database().ref('post/' + idMyPost).remove();
+        firebase.database().ref('myFavorite/' + idUser + '/post/' + keyItemFavorite).remove();
     }
     return (
         <div className="card">
@@ -59,12 +59,12 @@ function BoxCard2button({ idMyPost, image, title, date, address, price, area, st
                         <p className="text">{area} m<sup>2</sup> </p>
                     </span>
                 </div>
-                <button type="button" className="btn_left" onClick={() => handleDelMyPost()}>delete</button>
-                <button type="button" className="btn_right" onClick={() => handler({ content: 1, key: idMyPost, data: { image, title, address, price, area, star, province, description } })}>edit</button>
+                <button type="button" className="btn_left" onClick={() => handleDelPostFavorite()}>delete</button>
+                <button type="button" className="btn_right" onClick={() => handler({ content: 1, key: keyItemFavorite, data: { name, avatar, idSell, image, title, date, address, price, area, star, province, description } })}>read post</button>
             </div>
-            <ToastContainer/>
+            <ToastContainer />
         </div>
     )
 }
 
-export default BoxCard2button
+export default BoxCardFavorite
